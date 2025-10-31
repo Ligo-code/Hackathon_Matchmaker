@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+
+# Development
+.vite/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store

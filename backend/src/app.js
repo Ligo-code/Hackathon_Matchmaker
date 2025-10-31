@@ -3,6 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import User from "./models/User.js";
 import optionsRouter from "./routes/options.js";
+import dashboardRouter from "./routes/dashboard.js";
+import { errorHandler } from "./middleware/errorHandler.js";
+import { requestLogger, corsConfig } from "./middleware/logger.js";
 
 dotenv.config();
 
@@ -10,7 +13,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(requestLogger);
+app.use(cors(corsConfig));
 app.use(express.json());
 
 // Routes
@@ -22,8 +26,9 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Options for dropdowns
+// API Routes
 app.use("/api", optionsRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 // Example API routes for hackathon matchmaker
 app.get("/api/hackathons", (req, res) => {
@@ -200,5 +205,8 @@ function calculateInterestsJaccard(interests1, interests2) {
   const union = new Set([...interests1, ...interests2]).size || 1;
   return +(inter / union).toFixed(3);
 }
+
+// Error handling middleware 
+app.use(errorHandler);
 
 export default app;

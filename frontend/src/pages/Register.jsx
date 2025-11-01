@@ -5,7 +5,6 @@ import AuthInput from "../components/AuthInput";
 import AuthButton from "../components/AuthButton";
 import { useAuthStore } from "../store/useAuthStore";
 
-// ✅ MUST BE TOP-LEVEL (Fixes your Vite 'import/export' error)
 const INTEREST_OPTIONS = [
   "Ecology",
   "Economics",
@@ -27,15 +26,13 @@ export default function Register() {
   const loading = useAuthStore((s) => s.loading);
   const error = useAuthStore((s) => s.error);
 
-  // Form State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
-  const [interests, setInterests] = useState([]);
+  const [interest, setInterest] = useState("");
 
-  // Enable button only when valid
   const isValid = useMemo(() => {
     return (
       name.trim() &&
@@ -43,9 +40,9 @@ export default function Register() {
       pwd.trim() &&
       role &&
       experience &&
-      interests.length > 0
+      interest
     );
-  }, [name, email, pwd, role, experience, interests]);
+  }, [name, email, pwd, role, experience, interest]);
 
   const left = (
     <>
@@ -65,12 +62,6 @@ export default function Register() {
     </>
   );
 
-  function toggleInterest(val) {
-    setInterests((prev) =>
-      prev.includes(val) ? prev.filter((i) => i !== val) : [...prev, val]
-    );
-  }
-
   async function onSubmit(e) {
     e.preventDefault();
     if (!isValid) return;
@@ -81,12 +72,10 @@ export default function Register() {
       password: pwd,
       role,
       experience,
-      interests,
+      interests: [interest],
     });
 
-    if (ok) {
-      navigate("/"); // 👻 redirect to home or dashboard
-    }
+    if (ok) navigate("/");
   }
 
   return (
@@ -136,69 +125,90 @@ export default function Register() {
             required
           />
 
-          {/* Role Select */}
+          {/* Role */}
           <div>
-            <label className="mb-1 block text-sm text-white/70">
-              Your Role
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full rounded-xl bg-white/5 px-4 py-3 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300"
-              required
-            >
-              <option value="" disabled>
-                Select your role
-              </option>
-              <option value="frontend">Frontend</option>
-              <option value="backend">Backend</option>
-            </select>
-          </div>
-
-          {/* Experience Select */}
-          <div>
-            <label className="mb-1 block text-sm text-white/70">
-              Experience
-            </label>
-            <select
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-              className="w-full rounded-xl bg-white/5 px-4 py-3 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300"
-              required
-            >
-              <option value="" disabled>
-                Select experience
-              </option>
-              <option value="junior">Junior</option>
-              <option value="middle">Middle</option>
-              <option value="senior">Senior</option>
-            </select>
-          </div>
-
-          {/* Interest Multi-select */}
-          <div>
-            <label className="mb-2 block text-sm text-white/70">
-              Interests (pick at least one)
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {INTEREST_OPTIONS.map((opt) => {
-                const active = interests.includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => toggleInterest(opt)}
-                    className={`rounded-full px-3 py-1 text-sm transition ${
-                      active
-                        ? "bg-lime-400/20 text-lime-200 ring-1 ring-lime-300/50"
-                        : "bg-white/5 text-white/70 ring-1 ring-white/10 hover:bg-white/10"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
+            <label className="text-white/60 text-sm mb-1 block"></label>
+            <div className="relative">
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className={[
+                  "w-full appearance-none rounded-full border-0 bg-white px-5 py-3 shadow outline-none",
+                  "ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300",
+                  role ? "text-gray-900" : "text-gray-400",
+                ].join(" ")}
+                required
+              >
+                <option value="" disabled>
+                  Select your role
+                </option>
+                <option value="frontend">Frontend Developer</option>
+                <option value="backend">Backend Developer</option>
+                <option value="fullstack">Full-Stack Developer</option>
+                <option value="designer">Designer</option>
+                <option value="pm">Product Manager</option>
+              </select>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                ▾
+              </span>
             </div>
+          </div>
+
+          {/* Experience */}
+          <div>
+            <label className="text-white/60 text-sm mb-1 block"></label>
+            <div className="relative">
+              <select
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
+                className={[
+                  "w-full appearance-none rounded-full border-0 bg-white px-5 py-3 shadow outline-none",
+                  "ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300",
+                  experience ? "text-gray-900" : "text-gray-400",
+                ].join(" ")}
+                required
+              >
+                <option value="" disabled>
+                  Select experience level
+                </option>
+                <option value="junior">Junior</option>
+                <option value="middle">Mid-Level</option>
+                <option value="senior">Senior</option>
+              </select>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                ▾
+              </span>
+            </div>
+          </div>
+
+          {/* Interests (pick at least one) */}
+          <div>
+            <label className="text-white/60 text-sm mb-1 block"></label>
+            <div className="relative">
+              <select
+                value={interest}
+                onChange={(e) => setInterest(e.target.value)}
+                className={[
+                  "w-full appearance-none rounded-full border-0 bg-white px-5 py-3 shadow outline-none",
+                  "ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300",
+                  interest ? "text-gray-900" : "text-gray-400",
+                ].join(" ")}
+                required
+              >
+                <option value="" disabled>
+                  Select interest
+                </option>
+                {INTEREST_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                ▾
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-white/50"></p>
           </div>
 
           <AuthButton type="submit" disabled={!isValid || loading}>

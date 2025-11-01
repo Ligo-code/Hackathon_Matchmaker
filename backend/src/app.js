@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import User from "./models/User.js";
 import optionsRouter from "./routes/options.js";
 import dashboardRouter from "./routes/dashboard.js";
 import profileRouter from "./routes/profile.js";
+import authRouter from "./routes/auth.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger, corsConfig } from "./middleware/logger.js";
 import chatRoutes from "./routes/chatRoutes.js";
@@ -17,8 +19,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(requestLogger);
-app.use(cors(corsConfig));
+app.use(cors({ ...corsConfig, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 app.get("/", (req, res) => {
@@ -30,6 +33,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // API Routes
+app.use("/api/auth", authRouter);
 app.use("/api", optionsRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/profile", profileRouter);

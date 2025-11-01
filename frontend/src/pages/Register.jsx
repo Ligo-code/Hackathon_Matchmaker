@@ -14,12 +14,17 @@ export default function Register() {
 
   const left = (
     <>
-      <div className="text-6xl md:text-7xl lg:text-8xl font-creepster text-lime-300 tracking-wider leading-tight">
-        <div className="mb-2 text-5xl">👻</div>
-        <div>JOIN THE</div>
-        <div>MATCHMAKER</div>
+      <div className="text-center md:text-left font-eater text-primary tracking-wide leading-none">
+        <div className="text-[42px] md:text-[54px] lg:text-[64px]">👻</div>
+        <div className="text-[46px] md:text-[58px] lg:text-[72px]">
+          JOIN THE
+        </div>
+        <div className="text-[46px] md:text-[58px] lg:text-[72px]">
+          MATCHMAKER
+        </div>
       </div>
-      <p className="mt-10 text-lg italic text-white/70 max-w-md mx-auto md:mx-0">
+
+      <p className="mt-8 text-base md:text-lg text-white/70 max-w-md mx-auto md:mx-0 leading-relaxed">
         Create your Ghost ID and meet your perfect teammate.
       </p>
     </>

@@ -1,15 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
+import { useAuthStore } from "../store/useAuthStore";
 
-const socket = io(`${import.meta.env.VITE_API_URL}`); // socket server
+const socket = io(`${import.meta.env.VITE_API_URL}`);
 
-export default function Chats({ currentUserId }) {
+export default function Chats() {
   const [chatRooms, setChatRooms] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
+  const user = useAuthStore((state) => state.user);
+  const currentUserId = user?._id;
 
-  // Load user chat rooms
+   if (!currentUserId) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Please log in to access messages</p>
+      </div>
+    );
+  }
+  
   useEffect(() => {
     const fetchChats = async () => {
       const res = await fetch(
@@ -21,20 +33,20 @@ export default function Chats({ currentUserId }) {
     fetchChats();
   }, [currentUserId]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, activeChat]);
+
   // Join active chat room for real-time messages
   useEffect(() => {
     if (!activeChat) return;
 
     socket.emit("joinRoom", activeChat._id);
 
-    // Listen for new messages
-    socket.on("newMessage", (message) => {
-      if (message.chatRoom === activeChat._id) {
-        setMessages((prev) => [...prev, message]);
-      }
-    });
-
-    // Load initial messages
     const fetchMessages = async () => {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/messages/${activeChat._id}`
@@ -49,16 +61,57 @@ export default function Chats({ currentUserId }) {
     };
   }, [activeChat]);
 
+  // Listen for new messages separately
+  useEffect(() => {
+    const handleNewMessage = (message) => {
+      if (message.chatRoom === activeChat?._id) {
+        console.log("Socket message received:", message);
+
+        setMessages((prev) => {
+          const filteredPrev = prev.filter(
+            (msg) => !(msg.isOptimistic && msg.content === message.content)
+          );
+
+          const processedMessage = {
+            ...message,
+            sender: message.sender || { _id: message.sender },
+          };
+
+          return [...filteredPrev, processedMessage];
+        });
+      }
+    };
+
+    socket.on("newMessage", handleNewMessage);
+
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+    };
+  }, [activeChat]);
+
   const sendMessage = () => {
     if (!newMessage.trim() || !activeChat) return;
+
+    const optimisticMessage = {
+      _id: `optimistic-${Date.now()}`, // temporary ID
+      sender: {
+        _id: currentUserId,
+        name: "You",
+      },
+      content: newMessage,
+      createdAt: new Date().toISOString(),
+      chatRoom: activeChat._id,
+      isOptimistic: true,
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setNewMessage("");
 
     socket.emit("sendMessage", {
       chatRoomId: activeChat._id,
       senderId: currentUserId,
       content: newMessage,
     });
-
-    setNewMessage("");
   };
 
   const formatTime = (dateString) => {
@@ -66,149 +119,157 @@ export default function Chats({ currentUserId }) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const isMyMessage = (message) => {
+    const senderId = message.sender?._id || message.sender;
+    return senderId === currentUserId;
+  };
+
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-white">
-      <div className="w-80 border-r border-gray-800 bg-[#111111] flex flex-col">
-        <div className="p-6 border-b border-gray-800">
-          <h2 className="text-2xl font-bold text-white">Messages</h2>
-        </div>
+    <main className="flex flex-col items-center pt-14">
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="flex h-[800px] bg-transparent rounded-[var(--radius-xl)] overflow-hidden">
+          <div className="w-80 bg-(--color-surface) border border-(--color-border-soft) rounded-[var(--radius-xl)] m-4 flex flex-col overflow-hidden">
+            <div className="p-6" />
 
-        <div className="flex-1 overflow-y-auto">
-          {chatRooms.map((chat) => {
-            const otherParticipants = chat.participants.filter(
-              (p) => p._id !== currentUserId
-            );
-            const participantNames = otherParticipants
-              .map((p) => p.name)
-              .join(", ");
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+              {chatRooms.map((chat) => {
+                const otherParticipants = chat.participants.filter(
+                  (p) => p._id !== currentUserId
+                );
+                const participantNames = otherParticipants
+                  .map((p) => p.name)
+                  .join(", ");
 
-            return (
-              <div
-                key={chat._id}
-                className={`p-4 cursor-pointer border-b border-gray-800 transition-colors ${
-                  activeChat?._id === chat._id
-                    ? "bg-gray-900 border-l-4 border-lime-300"
-                    : "hover:bg-gray-900/50"
-                }`}
-                onClick={() => setActiveChat(chat)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-lime-300 to-green-500 flex items-center justify-center text-black font-bold">
-                    {participantNames.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white truncate">
-                      {participantNames}
-                    </h3>
-                    <p className="text-sm text-gray-400 truncate">
-                      {chat.lastMessage || "Start a conversation..."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="flex-1 flex flex-col">
-        {!activeChat ? (
-          <div className="flex-1 flex items-center justify-center bg-[#0a0a0a]">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">💬</span>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Select a chat
-              </h3>
-              <p className="text-gray-400">
-                Choose a conversation to start messaging
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="border-b border-gray-800 bg-[#111111] p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-lime-300 to-green-500 flex items-center justify-center text-black font-bold">
-                  {activeChat.participants
-                    .filter((p) => p._id !== currentUserId)
-                    .map((p) => p.name.charAt(0).toUpperCase())
-                    .join("")}
-                </div>
-                <div>
-                  <h2 className="font-semibold text-white">
-                    {activeChat.participants
-                      .filter((p) => p._id !== currentUserId)
-                      .map((p) => p.name)
-                      .join(", ")}
-                  </h2>
-                  <p className="text-sm text-gray-400">Online</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto bg-[#0a0a0a] p-4 space-y-4">
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-gray-500">
-                    No messages yet. Start the conversation!
-                  </p>
-                </div>
-              ) : (
-                messages.map((msg) => (
+                return (
                   <div
-                    key={msg._id}
-                    className={`flex ${
-                      msg.sender._id === currentUserId
-                        ? "justify-end"
-                        : "justify-start"
+                    key={chat._id}
+                    className={`p-3 cursor-pointer transition-colors ${
+                      activeChat?._id === chat._id
+                        ? "bg-[#303326] text-white"
+                        : "bg-transparent hover:bg-gray-900/50"
                     }`}
+                    onClick={() => setActiveChat(chat)}
                   >
-                    <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
-                        msg.sender._id === currentUserId
-                          ? "bg-lime-300 text-black rounded-br-none"
-                          : "bg-gray-800 text-white rounded-bl-none"
-                      }`}
-                    >
-                      <div className="text-sm">{msg.content}</div>
-                      <div
-                        className={`text-xs mt-1 ${
-                          msg.sender._id === currentUserId
-                            ? "text-gray-600"
-                            : "text-gray-400"
-                        }`}
-                      >
-                        {formatTime(msg.createdAt || new Date())}
+                    <div className="flex items-center gap-4">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-(--color-primary) to-(--color-secondary) flex items-center justify-center text-black font-bold text-sm">
+                        {participantNames.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className={`font-semibold text-sm truncate ${
+                            activeChat?._id === chat._id
+                              ? "text-white"
+                              : "text-(--color-text)"
+                          }`}
+                        >
+                          {participantNames}
+                        </h3>
+                        <p
+                          className={`text-xs truncate mt-1 ${
+                            activeChat?._id === chat._id
+                              ? "text-gray-300"
+                              : "text-(--color-muted)"
+                          }`}
+                        >
+                          {chat.lastMessage || ""}
+                        </p>
                       </div>
                     </div>
                   </div>
-                ))
-              )}
+                );
+              })}
             </div>
+          </div>
 
-            <div className="border-t border-gray-800 bg-[#111111] p-4">
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:border-lime-300 focus:outline-none transition-colors"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                />
-                <button
-                  className="bg-lime-300 text-black px-6 rounded-lg font-medium hover:bg-lime-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={sendMessage}
-                  disabled={!newMessage.trim()}
-                >
-                  Send
-                </button>
+          {/* Active chat area */}
+          <div className="flex-1 flex flex-col bg-transparent">
+            {!activeChat ? (
+              <div className="flex-1 flex items-center justify-center bg-transparent">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-(--color-surface) flex items-center justify-center mx-auto mb-4 border border-(--color-border-soft)">
+                    <span className="text-2xl">💬</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-(--color-text) mb-2">
+                    Select a chat
+                  </h3>
+                  <p className="text-(--color-muted) text-sm">
+                    Choose a conversation to start messaging
+                  </p>
+                </div>
               </div>
-            </div>
-          </>
-        )}
+            ) : (
+              <>
+                {/* Messages area with custom scrollbar */}
+                <div
+                  ref={messagesContainerRef}
+                  className="flex-1 overflow-y-auto bg-transparent p-4 space-y-3 custom-scrollbar"
+                >
+                  {messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-(--color-muted) text-sm">
+                        No messages yet. Start the conversation!
+                      </p>
+                    </div>
+                  ) : (
+                    messages.map((msg) => {
+                      const myMessage = isMyMessage(msg);
+
+                      return (
+                        <div
+                          key={msg._id}
+                          className={`flex ${
+                            myMessage ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-md px-3 py-2 rounded-lg ${
+                              myMessage
+                                ? "bg-[#303326] text-white rounded-br-none"
+                                : "bg-white text-black rounded-bl-none"
+                            }`}
+                          >
+                            <div className="text-sm">{msg.content}</div>
+                            <div
+                              className={`text-xs mt-1 ${
+                                myMessage ? "text-gray-300" : "text-gray-600"
+                              }`}
+                            >
+                              {formatTime(msg.createdAt || new Date())}
+                              {msg.isOptimistic && " (sending...)"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  {/* Invisible element to scroll to */}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Message input */}
+                <div className="bg-transparent p-4">
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 p-3 rounded-lg bg-white text-black placeholder-gray-500 border border-gray-300 focus:border-(--color-primary) focus:outline-none transition-colors text-sm"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message..."
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    />
+                    <button
+                      className="bg-(--color-primary) text-black px-4 rounded-lg font-medium hover:bg-(--color-secondary) transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      onClick={sendMessage}
+                      disabled={!newMessage.trim()}
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

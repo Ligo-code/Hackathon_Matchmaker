@@ -1,5 +1,4 @@
 import Button from "./Button";
-import CircleButton from "./CircleButton";
 
 export default function MatchCard({
   id,
@@ -9,10 +8,7 @@ export default function MatchCard({
   matchScore,
   interests,
   invited,
-  showPrev,
-  showNext,
   onInvite,
-  onPrev,
   onNext,
 }) {
   return (
@@ -74,18 +70,6 @@ export default function MatchCard({
           Next →
         </Button>
       </div>
-
-      {/* arrows */}
-      {showPrev && (
-        <div className="absolute -left-24 top-1/2 -translate-y-1/2">
-          <CircleButton direction="left" onClick={onPrev} />
-        </div>
-      )}
-      {showNext && (
-        <div className="absolute -right-24 top-1/2 -translate-y-1/2">
-          <CircleButton direction="right" onClick={onNext} />
-        </div>
-      )}
     </div>
   );
 }

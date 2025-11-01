@@ -6,7 +6,7 @@ export default function Navbar() {
   const menuItems = [
     { to: "/dashboard", label: "Dashboard" },
     { to: "/requests", label: "Requests" },
-    { to: "/messages", label: "Messages" },
+    { to: "/chats", label: "Messages" },
     { to: "/profile", label: "My profile" },
   ];
 

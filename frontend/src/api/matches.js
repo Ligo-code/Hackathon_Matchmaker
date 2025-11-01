@@ -1,34 +1,29 @@
 import { apiGet, apiPost } from "./client";
 
-const USER_ID = import.meta.env.VITE_USER_ID;
+const USER_ID = "690516d603df32cfec6c432d"; //temp
 
-// Получить следующего кандидата
 export async function getNextCandidate() {
-  return apiGet(`/matches/next-card/${USER_ID}`);
+  return apiGet(`/api/dashboard/next-card/${USER_ID}`);
 }
 
-// Отправить инвайт
 export async function sendInvite(toUserId) {
-  return apiPost(`/matches/invite`, {
+  return apiPost(`/api/dashboard/invite`, {
     fromUserId: USER_ID,
     toUserId,
   });
 }
 
-// Пропустить кандидата
 export async function skipCandidate(candidateId) {
-  return apiPost(`/matches/skip`, {
+  return apiPost(`/api/dashboard/skip`, {
     userId: USER_ID,
     candidateId,
   });
 }
 
-// Сбросить просмотренные и пропущенные
 export async function resetMatches() {
-  return apiPost(`/matches/reset/${USER_ID}`, {});
+  return apiPost(`/api/dashboard/reset/${USER_ID}`, {});
 }
 
-// Получить статистику пользователя
 export async function getUserStats() {
-  return apiGet(`/matches/stats/${USER_ID}`);
+  return apiGet(`/api/dashboard/stats/${USER_ID}`);
 }

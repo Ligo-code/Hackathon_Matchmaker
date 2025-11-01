@@ -49,13 +49,13 @@ export default function Dashboard() {
           Find your perfect teammate this hackathon — fast & fun!
         </p>
 
-        <div className="flex flex-col items-center justify-center w-[27rem] h-[36rem] mt-10 border-2 border-[var(--color-primary)] rounded-[var(--radius-xl)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] text-center">
+        <div className="flex flex-col items-center justify-center w-[27rem] h-[36rem] mt-12 border-2 border-[var(--color-primary)] rounded-[var(--radius-xl)] bg-[var(--color-surface)] shadow-[var(--shadow-card)] text-center">
           <p className="text-[60px] mb-4">💀</p>
           <p className="text-[22px] font-medium text-[var(--color-text)] mb-6 leading-tight">
             No more spooky <br /> matches for now!
           </p>
           <Button variant="primary" onClick={handleRestart}>
-            🔄 Start Over
+            Start Over
           </Button>
         </div>
       </main>
@@ -84,7 +84,7 @@ export default function Dashboard() {
         name={candidate.name}
         role={candidate.role}
         experience={candidate.experience}
-        score={candidate.matchScore}
+        matchScore={candidate.matchScore}
         interests={candidate.interests}
         onInvite={handleInvite}
         onNext={handleNext}

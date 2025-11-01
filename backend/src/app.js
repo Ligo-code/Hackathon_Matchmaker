@@ -6,6 +6,7 @@ import User from "./models/User.js";
 import optionsRouter from "./routes/options.js";
 import dashboardRouter from "./routes/dashboard.js";
 import profileRouter from "./routes/profile.js";
+import requestsRouter from "./routes/requests.js";
 import authRouter from "./routes/auth.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger, corsConfig } from "./middleware/logger.js";
@@ -37,6 +38,7 @@ app.use("/api/auth", authRouter);
 app.use("/api", optionsRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/requests", requestsRouter);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
 

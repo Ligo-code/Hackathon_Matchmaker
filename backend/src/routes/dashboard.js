@@ -2,19 +2,17 @@ import express from 'express';
 import User from '../models/User.js';
 import Invite from '../models/Invite.js';
 import { getNextCandidate, calculateMatchScore } from '../utils/matching.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Get next candidate card for dashboard
-router.get('/next-card/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const currentUser = await User.findById(userId);
-    
-    if (!currentUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
+// Apply authentication to all routes
+router.use(requireAuth);
 
+// Get next candidate card for authenticated user
+router.get('/me/next-card', async (req, res) => {
+  try {
+    const currentUser = req.user;
     const candidate = await getNextCandidate(currentUser, User, Invite);
     
     if (!candidate) {
@@ -45,17 +43,16 @@ router.get('/next-card/:userId', async (req, res) => {
 // Send invite to candidate
 router.post('/invite', async (req, res) => {
   try {
-    const { fromUserId, toUserId } = req.body;
+    const { toUserId } = req.body;
+    const fromUserId = req.user._id;
     
-    if (!fromUserId || !toUserId) {
-      return res.status(400).json({ error: "Missing required fields: fromUserId, toUserId" });
+    if (!toUserId) {
+      return res.status(400).json({ error: "Missing required field: toUserId" });
     }
 
-    const fromUser = await User.findById(fromUserId);
     const toUser = await User.findById(toUserId);
-    
-    if (!fromUser || !toUser) {
-      return res.status(404).json({ error: "User(s) not found" });
+    if (!toUser) {
+      return res.status(404).json({ error: "Target user not found" });
     }
 
     // Check if invite already exists
@@ -65,7 +62,7 @@ router.post('/invite', async (req, res) => {
     }
 
     // Calculate match score
-    const matchScore = calculateMatchScore(fromUser, toUser);
+    const matchScore = calculateMatchScore(req.user, toUser);
 
     // Create invite
     const invite = new Invite({
@@ -96,10 +93,11 @@ router.post('/invite', async (req, res) => {
 // Skip candidate
 router.post('/skip', async (req, res) => {
   try {
-    const { userId, candidateId } = req.body;
+    const { candidateId } = req.body;
+    const userId = req.user._id;
     
-    if (!userId || !candidateId) {
-      return res.status(400).json({ error: "Missing required fields: userId, candidateId" });
+    if (!candidateId) {
+      return res.status(400).json({ error: "Missing required field: candidateId" });
     }
 
     await User.findByIdAndUpdate(
@@ -120,9 +118,9 @@ router.post('/skip', async (req, res) => {
 });
 
 // Reset matching lists (restart cycle)
-router.post('/reset/:userId', async (req, res) => {
+router.post('/me/reset', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user._id;
     
     const user = await User.findByIdAndUpdate(
       userId,
@@ -154,14 +152,10 @@ router.post('/reset/:userId', async (req, res) => {
 });
 
 // Get user's dashboard stats
-router.get('/stats/:userId', async (req, res) => {
+router.get('/me/stats', async (req, res) => {
   try {
-    const { userId } = req.params;
-    
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const userId = req.user._id;
+    const user = req.user;
 
     const sentInvites = await Invite.countDocuments({ from: userId });
     const receivedInvites = await Invite.countDocuments({ to: userId });

@@ -1,16 +1,27 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
+import { useAuthStore } from "../store/useAuthStore";
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
-export default function Chats({ currentUserId }) {
+export default function Chats() {
   const [chatRooms, setChatRooms] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const user = useAuthStore((state) => state.user);
+  const currentUserId = user?._id;
 
+   if (!currentUserId) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Please log in to access messages</p>
+      </div>
+    );
+  }
+  
   useEffect(() => {
     const fetchChats = async () => {
       const res = await fetch(

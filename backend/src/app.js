@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import User from "./models/User.js";
 import optionsRouter from "./routes/options.js";
 import dashboardRouter from "./routes/dashboard.js";
+import profileRouter from "./routes/profile.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger, corsConfig } from "./middleware/logger.js";
 import chatRoutes from "./routes/chatRoutes.js";
@@ -31,6 +32,7 @@ app.get("/api/health", (req, res) => {
 // API Routes
 app.use("/api", optionsRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/profile", profileRouter);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);
 

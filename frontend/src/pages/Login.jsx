@@ -33,7 +33,7 @@ export default function Login() {
           No ghost ID yet?{" "}
           <Link
             to="/register"
-            className="font-semibold text-lime-300 hover:text-lime-200 inline-flex items-center gap-1"
+            className="ml-1 font-semibold text-lime-300 hover:text-lime-200 inline-flex items-center gap-1"
           >
             Sign Up <span aria-hidden>💀</span> →
           </Link>
@@ -42,7 +42,7 @@ export default function Login() {
         <form
           className="mt-8 space-y-4"
           onSubmit={(e) => {
-            e.preventDefault(); /* TODO: login */
+            e.preventDefault();
           }}
         >
           <AuthInput

@@ -8,6 +8,9 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
+  const [role, setRole] = useState("");
+  const [skills, setSkills] = useState("");
+  const [interests, setInterests] = useState("");
 
   const left = (
     <>
@@ -33,16 +36,16 @@ export default function Register() {
           Already have one?{" "}
           <Link
             to="/login"
-            className="font-semibold text-lime-300 hover:text-lime-200 inline-flex items-center gap-1"
+            className="ml-1 font-semibold text-lime-300 hover:text-lime-200 inline-flex items-center gap-1"
           >
-            Log in →
+            Log in 👻 →
           </Link>
         </p>
 
         <form
           className="mt-8 space-y-4"
           onSubmit={(e) => {
-            e.preventDefault(); /* TODO: register */
+            e.preventDefault();
           }}
         >
           <AuthInput
@@ -63,6 +66,26 @@ export default function Register() {
             value={pwd}
             onChange={(e) => setPwd(e.target.value)}
             placeholder="Create a Password"
+            required
+          />
+          <AuthInput
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            placeholder="Your Role"
+            required
+          />
+
+          <AuthInput
+            value={skills}
+            onChange={(e) => setSkills(e.target.value)}
+            placeholder="Your Skills"
+            required
+          />
+
+          <AuthInput
+            value={interests}
+            onChange={(e) => setInterests(e.target.value)}
+            placeholder="Your Interests"
             required
           />
           <AuthButton type="submit">Sign Up</AuthButton>

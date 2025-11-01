@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io(`${import.meta.env.VITE_BACKEND_URL}`); // socket server
+const socket = io(`${import.meta.env.VITE_API_URL}`); // socket server
 
 export default function Chats({ currentUserId }) {
   const [chatRooms, setChatRooms] = useState([]);
@@ -13,7 +13,7 @@ export default function Chats({ currentUserId }) {
   useEffect(() => {
     const fetchChats = async () => {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/chats/${currentUserId}`
+        `${import.meta.env.VITE_API_URL}/api/chats/${currentUserId}`
       );
       const data = await res.json();
       setChatRooms(data);
@@ -37,7 +37,7 @@ export default function Chats({ currentUserId }) {
     // Load initial messages
     const fetchMessages = async () => {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/messages/${activeChat._id}`
+        `${import.meta.env.VITE_API_URL}/api/messages/${activeChat._id}`
       );
       const data = await res.json();
       setMessages(data);

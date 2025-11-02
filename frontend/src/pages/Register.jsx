@@ -144,9 +144,6 @@ export default function Register() {
                 </option>
                 <option value="frontend">Frontend Developer</option>
                 <option value="backend">Backend Developer</option>
-                <option value="fullstack">Full-Stack Developer</option>
-                <option value="designer">Designer</option>
-                <option value="pm">Product Manager</option>
               </select>
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
                 ▾
@@ -172,7 +169,7 @@ export default function Register() {
                   Select experience level
                 </option>
                 <option value="junior">Junior</option>
-                <option value="middle">Mid-Level</option>
+                <option value="middle">Middle</option>
                 <option value="senior">Senior</option>
               </select>
               <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">

@@ -31,7 +31,8 @@ export default function Register() {
   const [pwd, setPwd] = useState("");
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
-  const [interest, setInterest] = useState("");
+
+  const [interests, setInterests] = useState([]);
 
   const isValid = useMemo(() => {
     return (
@@ -40,27 +41,37 @@ export default function Register() {
       pwd.trim() &&
       role &&
       experience &&
-      interest
+      interests.length > 0
     );
-  }, [name, email, pwd, role, experience, interest]);
+  }, [name, email, pwd, role, experience, interests]);
 
   const left = (
-    <>
-      <div className="text-center md:text-left font-eater text-primary tracking-wide leading-none">
-        <div className="text-[42px] md:text-[54px] lg:text-[64px]">👻</div>
-        <div className="text-[46px] md:text-[58px] lg:text-[72px]">
-          JOIN THE
+    <div className="-translate-y-10 md:-translate-y-12">
+      <div className="text-center font-eater text-primary tracking-[0.02em] flex flex-col items-center">
+        <div className="text-[42px] md:text-[54px] lg:text-[64px] ghost-wiggle cursor-pointer select-none">
+          👻
         </div>
         <div className="text-[46px] md:text-[58px] lg:text-[72px]">
+          HACKATHON
+        </div>
+        <div className="text-[46px] md:text-[58px] lg:text-[72px] mt-2">
           MATCHMAKER
         </div>
       </div>
 
-      <p className="mt-8 text-base md:text-lg text-white/70 max-w-md mx-auto md:mx-0 leading-relaxed">
-        Create your Ghost ID and meet your perfect teammate.
+      <p className="mt-5 text-base md:text-lg text-white/200 max-w-md mx-auto leading-relaxed text-center italic">
+        Find your perfect teammate this
+        <br />
+        hackathon — fast &amp; fun!
       </p>
-    </>
+    </div>
   );
+
+  function toggleInterest(val) {
+    setInterests((prev) =>
+      prev.includes(val) ? prev.filter((i) => i !== val) : [...prev, val]
+    );
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -72,26 +83,42 @@ export default function Register() {
       password: pwd,
       role,
       experience,
-      interests: [interest],
+      interests,
     });
 
-    if (ok) navigate("/");
+    if (ok) {
+      navigate("/");
+    }
   }
 
   return (
     <AuthLayout left={left}>
-      <div className="mx-auto max-w-md">
-        <h2 className="text-3xl font-extrabold leading-tight">
+      <div className="mx-auto max-w-md mt-6">
+        <h2 className="text-3xl font-extrabold leading-tight text-center">
           Create Your Ghost ID
         </h2>
 
-        <p className="mt-2 text-sm text-white/70">
-          Already have one?
+        <p className="mt-2 text-sm text-center">
+          <span className="text-white/70 font-bold">Already one of us?</span>
           <Link
             to="/login"
-            className="ml-1 font-semibold text-lime-300 hover:text-lime-200 inline-flex items-center gap-1"
+            className="
+              ml-2 font-bold inline-flex items-center gap-1
+              !text-lime-300 visited:!text-lime-300
+              hover:!text-lime-200 hover:underline underline-offset-4
+              transition !opacity-100 group
+            "
           >
-            Log in 👻 →
+            Log in
+            <span
+              className="
+                inline-block transition-transform
+                group-hover:rotate-[8deg] group-hover:translate-x-[1px]
+              "
+            >
+              👻
+            </span>
+            →
           </Link>
         </p>
 
@@ -108,7 +135,6 @@ export default function Register() {
             placeholder="Enter your name"
             required
           />
-
           <AuthInput
             type="email"
             value={email}
@@ -116,7 +142,6 @@ export default function Register() {
             placeholder="Enter your email"
             required
           />
-
           <AuthInput
             type="password"
             value={pwd}
@@ -125,9 +150,7 @@ export default function Register() {
             required
           />
 
-          {/* Role */}
           <div>
-            <label className="text-white/60 text-sm mb-1 block"></label>
             <div className="relative">
               <select
                 value={role}
@@ -151,9 +174,7 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Experience */}
           <div>
-            <label className="text-white/60 text-sm mb-1 block"></label>
             <div className="relative">
               <select
                 value={experience}
@@ -178,34 +199,38 @@ export default function Register() {
             </div>
           </div>
 
-          {/* Interests (pick at least one) */}
           <div>
-            <label className="text-white/60 text-sm mb-1 block"></label>
-            <div className="relative">
-              <select
-                value={interest}
-                onChange={(e) => setInterest(e.target.value)}
-                className={[
-                  "w-full appearance-none rounded-full border-0 bg-white px-5 py-3 shadow outline-none",
-                  "ring-1 ring-white/10 focus:ring-2 focus:ring-lime-300",
-                  interest ? "text-gray-900" : "text-gray-400",
-                ].join(" ")}
-                required
-              >
-                <option value="" disabled>
-                  Select interest
-                </option>
-                {INTEREST_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
-                ▾
-              </span>
+            <label className="text-white/70 text-sm mb-3 block font-semibold text-center">
+              Interests (pick at least one and up to 5)
+            </label>
+
+            <div>
+              <label className="text-white/70 text-sm mb-3 block font-semibold text-center"></label>
+
+              <div className="flex flex-wrap justify-center gap-2 max-w-md mx-auto">
+                {INTEREST_OPTIONS.map((opt) => {
+                  const active = interests.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => toggleInterest(opt)}
+                      aria-pressed={active}
+                      className={[
+                        "pill-wiggle", // 👻 wiggle on hover
+                        "px-4 py-1.5 rounded-full text-sm font-medium select-none transition-all duration-200",
+
+                        active
+                          ? "bg-lime-300 text-gray-900 border border-lime-400 shadow-md hover:shadow-lg hover:bg-lime-200"
+                          : "bg-white/10 text-white/90 border border-white/20 hover:border-lime-300 hover:text-lime-200 hover:bg-white/20 hover:shadow-md",
+                      ].join(" ")}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <p className="mt-1 text-xs text-white/50"></p>
           </div>
 
           <AuthButton type="submit" disabled={!isValid || loading}>

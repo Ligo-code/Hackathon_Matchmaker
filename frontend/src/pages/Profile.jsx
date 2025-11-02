@@ -171,7 +171,6 @@ export default function Profile() {
 
               
               <CustomSelect
-                label="Your Role"
                 value={formData.role}
                 options={options.roles}
                 onChange={(val) => setFormData((p) => ({ ...p, role: val }))}
@@ -179,7 +178,6 @@ export default function Profile() {
 
               
               <CustomSelect
-                label="Experience Level"
                 value={formData.experience}
                 options={options.experience}
                 onChange={(val) =>

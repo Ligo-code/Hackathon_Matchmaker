@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { useAuthStore } from "../store/useAuthStore";
+import EmojiPicker from "emoji-picker-react";
+import { Smile } from "lucide-react";
 
 const socket = io(`${import.meta.env.VITE_API_URL}`);
 
@@ -9,19 +11,35 @@ export default function Chats() {
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const emojiPickerRef = useRef(null);
   const user = useAuthStore((state) => state.user);
   const currentUserId = user?._id;
 
-   if (!currentUserId) {
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  if (!currentUserId) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Please log in to access messages</p>
       </div>
     );
   }
-  
+
   useEffect(() => {
     const fetchChats = async () => {
       const res = await fetch(
@@ -246,18 +264,48 @@ export default function Chats() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message input */}
+                {/* Input with emoji inside field */}
                 <div className="bg-transparent p-4">
-                  <div className="flex gap-2">
-                    <input
-                      className="flex-1 p-3 rounded-lg bg-white text-black placeholder-gray-500 border border-gray-300 focus:border-(--color-primary) focus:outline-none transition-colors text-sm"
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
-                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    />
+                  <div
+                    className="relative flex items-center gap-2"
+                    ref={emojiPickerRef}
+                  >
+                    {/* Remove flex-1 from here and add it to the input directly */}
+                    <div className="relative flex-1">
+                      <input
+                        className="w-full p-3 pr-10 rounded-lg bg-white text-black placeholder-gray-500 border border-gray-300 focus:border-(--color-primary) focus:outline-none transition-colors text-sm"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                      />
+
+                      <button
+                        type="button"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-(--color-primary)"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowEmojiPicker((prev) => !prev);
+                        }}
+                      >
+                        <Smile size={23} />
+                      </button>
+
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-12 right-0 z-50">
+                          <EmojiPicker
+                            onEmojiClick={(emojiData) =>
+                              setNewMessage((prev) => prev + emojiData.emoji)
+                            }
+                            theme="light"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Add explicit width to send button to ensure consistent size */}
                     <button
-                      className="bg-(--color-primary) text-black px-4 rounded-lg font-medium hover:bg-(--color-secondary) transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      className="bg-(--color-primary) text-black px-6 py-3 rounded-lg font-medium hover:bg-(--color-secondary) transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
                       onClick={sendMessage}
                       disabled={!newMessage.trim()}
                     >

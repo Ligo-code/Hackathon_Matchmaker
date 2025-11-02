@@ -6,15 +6,15 @@
   --font-chivo: "Chivo", sans-serif;
   --font-eater: "Eater", cursive;
 
-  --color-primary: #D7FC70;
-  --color-secondary: #ECFFB7;
+  --color-primary: #d7fc70;
+  --color-secondary: #ecffb7;
   --color-dark: #080808;
-  --color-text: #EDEDED;
-  --color-muted: #9CA3AF;
+  --color-text: #ededed;
+  --color-muted: #9ca3af;
 
   --radius-xl: 1.25rem;
 
-  --color-surface: #0F0F0F;
+  --color-surface: #0f0f0f;
   --color-border-soft: rgba(255, 255, 255, 0.04);
   --shadow-card: 0 0 0 1px rgba(215, 252, 112, 0.3),
     0 10px 30px rgba(0, 0, 0, 0.45);
@@ -88,4 +88,46 @@ a:active {
 
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
   visibility: visible;
+}
+@keyframes ghost-wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(6deg);
+  }
+  50% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.ghost-wiggle:hover {
+  animation: ghost-wiggle 0.6s ease-in-out;
+}
+@keyframes pill-wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(3deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.pill-wiggle:hover {
+  animation: pill-wiggle 0.35s ease-in-out;
 }

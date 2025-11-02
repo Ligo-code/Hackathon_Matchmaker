@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { apiPut, apiGet } from "../api/client";
 import Button from "../components/ui/Button";
+import CustomSelect from "../components/ui/CustomSelect";
 import { User, Mail, Laptop, Lightbulb } from "lucide-react";
 
 export default function Profile() {
@@ -25,7 +26,7 @@ export default function Profile() {
     if (!user) fetchMe();
   }, [user, fetchMe]);
 
-  // загрузка опций (interests, roles, experience)
+  // загрузка опций
   useEffect(() => {
     async function fetchOptions() {
       try {
@@ -38,7 +39,7 @@ export default function Profile() {
     fetchOptions();
   }, []);
 
-  // заполнение формы
+  
   useEffect(() => {
     if (user) {
       setFormData({
@@ -50,13 +51,13 @@ export default function Profile() {
     }
   }, [user]);
 
-  // изменение текстовых полей
+  
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  // выбор интересов
+  
   function toggleInterest(interest) {
     setFormData((prev) => {
       const alreadySelected = prev.interests.includes(interest);
@@ -69,7 +70,7 @@ export default function Profile() {
     });
   }
 
-  // сохранение профиля
+  
   async function handleSave() {
     setLoading(true);
     try {
@@ -109,7 +110,7 @@ export default function Profile() {
           px-10 py-10 text-left
         "
       >
-        {/* avatar показываем только если не editMode */}
+        
         {!editMode && (
           <img
             src="/images/ghost.png"
@@ -152,7 +153,7 @@ export default function Profile() {
 
             <div className="mt-8 self-center">
               <Button variant="primary" onClick={() => setEditMode(true)}>
-                ✏️ Edit
+                Edit
               </Button>
             </div>
           </>
@@ -168,51 +169,25 @@ export default function Profile() {
                 className="w-full rounded-full px-5 py-2 border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
               />
 
-              {/* Role select */}
-              <div className="relative">
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="w-full rounded-full px-5 py-2 border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] capitalize appearance-none pr-10"
-                >
-                  <option value="" disabled>
-                    Select your role
-                  </option>
-                  {options.roles.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-                <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]">
-                  ▾
-                </span>
-              </div>
+              
+              <CustomSelect
+                label="Your Role"
+                value={formData.role}
+                options={options.roles}
+                onChange={(val) => setFormData((p) => ({ ...p, role: val }))}
+              />
 
-              {/* Experience select */}
-              <div className="relative">
-                <select
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  className="w-full rounded-full px-5 py-2 border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] capitalize appearance-none pr-10"
-                >
-                  <option value="" disabled>
-                    Select experience level
-                  </option>
-                  {options.experience.map((e) => (
-                    <option key={e} value={e}>
-                      {e}
-                    </option>
-                  ))}
-                </select>
-                <span className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]">
-                  ▾
-                </span>
-              </div>
+              
+              <CustomSelect
+                label="Experience Level"
+                value={formData.experience}
+                options={options.experience}
+                onChange={(val) =>
+                  setFormData((p) => ({ ...p, experience: val }))
+                }
+              />
 
-              {/* Interests as selectable tags */}
+              
               <div className="mt-4">
                 <p className="text-[var(--color-muted)] text-sm mb-2">
                   Select your interests:
@@ -248,7 +223,7 @@ export default function Profile() {
                 onClick={handleSave}
                 disabled={loading}
               >
-                {loading ? "Saving..." : "💾 Save"}
+                {loading ? "Saving..." : "Save"}
               </Button>
 
               <Button variant="secondary" onClick={() => setEditMode(false)}>

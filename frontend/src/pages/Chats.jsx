@@ -144,6 +144,10 @@ export default function Chats() {
 
   return (
     <main className="flex flex-col items-center pt-14">
+      <h2 className="text-[26px] font-bold text-primary mb-2">Messages</h2>
+      <p className="text-[16px] text-[var(--color-muted)] mb-10">
+        Chat with your matches
+      </p>
       <div className="w-full max-w-6xl mx-auto">
         <div className="flex h-[800px] bg-transparent rounded-[var(--radius-xl)] overflow-hidden">
           <div className="w-80 bg-(--color-surface) border border-(--color-border-soft) rounded-[var(--radius-xl)] m-4 flex flex-col overflow-hidden">

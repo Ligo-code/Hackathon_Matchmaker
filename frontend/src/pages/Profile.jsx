@@ -39,7 +39,6 @@ export default function Profile() {
     fetchOptions();
   }, []);
 
-  
   useEffect(() => {
     if (user) {
       setFormData({
@@ -51,13 +50,11 @@ export default function Profile() {
     }
   }, [user]);
 
-  
   function handleChange(e) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  
   function toggleInterest(interest) {
     setFormData((prev) => {
       const alreadySelected = prev.interests.includes(interest);
@@ -70,7 +67,6 @@ export default function Profile() {
     });
   }
 
-  
   async function handleSave() {
     setLoading(true);
     try {
@@ -94,9 +90,12 @@ export default function Profile() {
 
   return (
     <main className="flex flex-col items-center pt-14 text-center">
-      <h2 className="text-[40px] font-bold text-[var(--color-primary)] mb-2">
-        My Profile
+      <h2 className="text-[26px] font-bold text-primary mb-2">
+        Your Ghostly ID
       </h2>
+      <p className="text-[16px] text-[var(--color-muted)] mb-10">
+        This is your haunted hacker profile - edit it if you dare.🕸️
+      </p>
 
       <div
         className="
@@ -110,7 +109,6 @@ export default function Profile() {
           px-10 py-10 text-left
         "
       >
-        
         {!editMode && (
           <img
             src="/images/ghost.png"
@@ -169,14 +167,12 @@ export default function Profile() {
                 className="w-full rounded-full px-5 py-2 border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
               />
 
-              
               <CustomSelect
                 value={formData.role}
                 options={options.roles}
                 onChange={(val) => setFormData((p) => ({ ...p, role: val }))}
               />
 
-              
               <CustomSelect
                 value={formData.experience}
                 options={options.experience}
@@ -185,7 +181,6 @@ export default function Profile() {
                 }
               />
 
-              
               <div className="mt-4">
                 <p className="text-[var(--color-muted)] text-sm mb-2">
                   Select your interests:
@@ -216,11 +211,7 @@ export default function Profile() {
             <div className="flex-1"></div>
 
             <div className="flex justify-center gap-6 mt-6">
-              <Button
-                variant="primary"
-                onClick={handleSave}
-                disabled={loading}
-              >
+              <Button variant="primary" onClick={handleSave} disabled={loading}>
                 {loading ? "Saving..." : "Save"}
               </Button>
 

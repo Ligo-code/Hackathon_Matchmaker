@@ -4,7 +4,6 @@ import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Requests from "./pages/Requests";
 import Profile from "./pages/Profile";
-
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chats from "./pages/Chats";

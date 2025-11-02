@@ -1,21 +1,17 @@
 import express from 'express';
 import User from '../models/User.js';
+import { validateProfileUpdate, validatePasswordChange } from '../middleware/validation.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// TODO: Add authentication middleware when auth module is ready
-// TODO: Add authorization check - users should only access their own profile
+// Apply authentication to all routes
+router.use(requireAuth);
 
-// Get user profile
-router.get('/:userId', async (req, res) => {
+// Get own profile
+router.get('/me', async (req, res) => {
   try {
-    const { userId } = req.params;
-    
-    const user = await User.findById(userId).select('-password');
-    
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    const user = req.user;
 
     res.json({
       user: {
@@ -36,41 +32,17 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-// Update user profile
-router.put('/:userId', async (req, res) => {
+// Update own profile
+router.put('/me', validateProfileUpdate, async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user._id;
     const { name, interests, experience, role } = req.body;
     
     const updateData = {};
-    // Basic validation
-    if (name) {
-        if (name.length < 2 || name.length > 100) {
-          return res.status(400).json({ 
-            error: "Name must be between 2 and 100 characters" 
-          });
-        }
-        updateData.name = name;
-      }
-      
-      if (interests) {
-        if (!Array.isArray(interests)) {
-          return res.status(400).json({ 
-            error: "Interests must be an array" 
-          });
-        }
-        updateData.interests = interests;
-      }
-      
-      if (experience) {
-        const validExperience = ['junior', 'middle', 'senior'];
-        if (!validExperience.includes(experience)) {
-          return res.status(400).json({ 
-            error: "Invalid experience level. Must be: junior or middle or senior" 
-          });
-        }
-        updateData.experience = experience;
-      }
+    if (name) updateData.name = name;
+    if (interests) updateData.interests = interests;
+    if (experience) updateData.experience = experience;
+    if (role) updateData.role = role;
 
     const user = await User.findByIdAndUpdate(
       userId,
@@ -100,22 +72,60 @@ router.put('/:userId', async (req, res) => {
   }
 });
 
-// Deactivate account
-router.put('/:userId/deactivate', async (req, res) => {
+// Change own password
+router.put('/me/password', validatePasswordChange, async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user._id;
+    const { currentPassword, newPassword } = req.body;
     
-    // TODO: Add authorization check - users should only deactivate their own account
-    // TODO: Consider requiring password confirmation for this action
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isActive: false },
-      { new: true }
-    ).select('-password');
-
+    const user = await User.findById(userId).select('+password');
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Update password (will be hashed by pre-save middleware)
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to update password" });
+  }
+});
+
+// Deactivate own account
+router.put('/me/deactivate', async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ 
+        error: "Password confirmation is required to deactivate account" 
+      });
+    }
+
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Verify password before deactivation
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Incorrect password" });
+    }
+
+    // Deactivate account
+    user.isActive = false;
+    await user.save();
 
     res.json({ 
       message: "Account deactivated successfully",
@@ -130,37 +140,5 @@ router.put('/:userId/deactivate', async (req, res) => {
     res.status(500).json({ error: "Failed to deactivate account" });
   }
 });
-
-// Reactivate account
-router.put('/:userId/activate', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    // TODO: Define who can reactivate accounts (user themselves via login? support team?)
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isActive: true },
-      { new: true }
-    ).select('-password');
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.json({ 
-      message: "Account activated successfully",
-      user: {
-        _id: user._id,
-        name: user.name,
-        isActive: user.isActive
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to activate account" });
-  }
-});
-
-// TODO: Password change endpoint will be added after auth module implementation
 
 export default router;

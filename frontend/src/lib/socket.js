@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 const SOCKET_URL =
   import.meta.env.VITE_SOCKET_URL ??
   import.meta.env.VITE_API_URL ??
-  (import.meta.env.DEV ? "http://localhost:3000" : window.location.origin);
+  (import.meta.env.DEV ? `import.meta.env.VITE_API_URL` : window.location.origin);
 
 // Export a single shared socket instance
 export const socket = io(SOCKET_URL, {

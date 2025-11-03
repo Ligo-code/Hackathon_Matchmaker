@@ -1,5 +1,8 @@
 # Hackathon Matchmaker
 
+A platform that helps hackathon participants find perfect teammates based on skills, interests, and roles.
+
+#
 Basic project structure for hackathon matchmaker application.
 
 ## Project Structure
@@ -36,3 +39,30 @@ npm run dev:backend
 ```bash
 npm install
 ```
+
+## 📸 App Screenshots
+
+
+### Login 
+Secure authentication to access your account  
+![Login](./frontend/public/images/screenshots/login.png) 
+
+### Register
+Create a new account with your skills and interests
+![Register](./frontend/public/images/screenshots/register.png) 
+
+### Dashboard 
+Find Your Perfect Match
+![Dashboard](./frontend/public/images/screenshots/dashboard.png) 
+
+### Requests 
+Manage Match Requests - accept or decline invitations
+![Requests](./frontend/public/images/screenshots/request.png) 
+
+### Chat 
+Chat with Your Matches - instant messaging with your matches
+![Chat](./frontend/public/images/screenshots/chat.png) 
+
+### Profile 
+Your Information Hub - view and edit your profile, skills, experience, and logout
+![Profile](./frontend/public/images/screenshots/profile.png) 

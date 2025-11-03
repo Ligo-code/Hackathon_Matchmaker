@@ -11,6 +11,7 @@ export async function requireAuth(req, res, next) {
     }
 
     const { uid } = jwt.verify(token, JWT_SECRET);
+    console.log("🔥 Verified token uid:", uid);//new
     const user = await User.findById(uid);
     
     if (!user) {

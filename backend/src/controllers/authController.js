@@ -11,7 +11,8 @@ function sign(uid) {
 function setAuthCookie(res, token) {
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: NODE_ENV === "production" ? "None" : "Lax",
+    sameSite: NODE_ENV === "production" ? "none" : "Lax",
+    path: "/",
     secure: NODE_ENV === "production",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });

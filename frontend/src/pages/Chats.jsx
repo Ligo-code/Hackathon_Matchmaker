@@ -52,7 +52,10 @@ export default function Chats() {
   }, [currentUserId]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -149,7 +152,7 @@ export default function Chats() {
         Chat with your matches
       </p>
       <div className="w-full max-w-6xl mx-auto">
-        <div className="flex h-[800px] bg-transparent rounded-[var(--radius-xl)] overflow-hidden">
+        <div className="flex h-[750px] bg-transparent rounded-[var(--radius-xl)] overflow-hidden">
           <div className="w-80 bg-(--color-surface) border border-(--color-border-soft) rounded-[var(--radius-xl)] m-4 flex flex-col overflow-hidden">
             <div className="p-6" />
 

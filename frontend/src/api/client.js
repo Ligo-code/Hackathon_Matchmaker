@@ -1,7 +1,7 @@
 const ENV_BASE = import.meta.env.VITE_API_URL;
 const DEFAULT_BASE =
   ENV_BASE ??
-  (import.meta.env.DEV ? `import.meta.env.VITE_API_URL` : window.location.origin);
+  (import.meta.env.DEV ? `${import.meta.env.VITE_API_URL}` : window.location.origin);
 
 const API_BASE = stripTrailingSlash(DEFAULT_BASE);
 const DEFAULT_TIMEOUT_MS = 12000; // 12s

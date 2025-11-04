@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import AuthInput from "../components/AuthInput";
 import AuthButton from "../components/AuthButton";
 import { useAuthStore } from "../store/useAuthStore";
+import { validators } from "../utils/validation";
 
 const leftHero = (
   <div className="-translate-y-10 md:-translate-y-12">
@@ -33,7 +34,15 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
 
-  const canSubmit = useMemo(() => email.trim() && pwd.trim(), [email, pwd]);
+  // Real-time validation errors
+  const [emailError, setEmailError] = useState(null);
+
+  // Validate email in real-time
+  useEffect(() => {
+    setEmailError(validators.email(email));
+  }, [email]);
+
+  const canSubmit = useMemo(() => email.trim() && pwd.trim() && !emailError, [email, pwd, emailError]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -79,22 +88,32 @@ export default function Login() {
           </div>
         )}
         <form className="mt-8 space-y-4" onSubmit={onSubmit}>
-          <AuthInput
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            autoComplete="email"
-            required
-          />
-          <AuthInput
-            type="password"
-            value={pwd}
-            onChange={(e) => setPwd(e.target.value)}
-            placeholder="Enter your Password"
-            autoComplete="current-password"
-            required
-          />
+          <div>
+            <AuthInput
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              autoComplete="email"
+              required
+            />
+            {emailError && (
+              <p className="mt-1 text-xs text-red-400">⚠️ {emailError}</p>
+            )}
+          </div>
+          <div>
+            <AuthInput
+              type="password"
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+              placeholder="Enter your Password"
+              autoComplete="current-password"
+              required
+            />
+            {!pwd.trim() && pwd.length > 0 && (
+              <p className="mt-1 text-xs text-red-400">⚠️ Password is required</p>
+            )}
+          </div>
           <AuthButton type="submit" disabled={!canSubmit || loading}>
             {loading ? "Logging in..." : "Login"}
           </AuthButton>

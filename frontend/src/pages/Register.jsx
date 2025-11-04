@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import AuthInput from "../components/AuthInput";
 import AuthButton from "../components/AuthButton";
 import { useAuthStore } from "../store/useAuthStore";
+import { validators } from "../utils/validation";
 
 const INTEREST_OPTIONS = [
   "Ecology",
@@ -31,8 +32,32 @@ export default function Register() {
   const [pwd, setPwd] = useState("");
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
+  const [interest, setInterest] = useState("");
 
   const [interests, setInterests] = useState([]);
+
+  // Real-time validation errors
+  const [nameError, setNameError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
+  const [interestsError, setInterestsError] = useState(null);
+
+  // Validate fields in real-time
+  useEffect(() => {
+    setNameError(validators.name(name));
+  }, [name]);
+
+  useEffect(() => {
+    setEmailError(validators.email(email));
+  }, [email]);
+
+  useEffect(() => {
+    setPasswordError(validators.password(pwd));
+  }, [pwd]);
+
+  useEffect(() => {
+    setInterestsError(validators.interests(interests));
+  }, [interests]);
 
   const isValid = useMemo(() => {
     return (
@@ -129,26 +154,46 @@ export default function Register() {
         )}
 
         <form className="mt-8 space-y-4" onSubmit={onSubmit}>
-          <AuthInput
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-            required
-          />
-          <AuthInput
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-          />
-          <AuthInput
-            type="password"
-            value={pwd}
-            onChange={(e) => setPwd(e.target.value)}
-            placeholder="Create a Password"
-            required
-          />
+          <div>
+            <AuthInput
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+            />
+            {nameError && (
+              <p className="mt-1 text-xs text-red-400">⚠️ {nameError}</p>
+            )}
+          </div>
+
+          <div>
+            <AuthInput
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+            {emailError && (
+              <p className="mt-1 text-xs text-red-400">⚠️ {emailError}</p>
+            )}
+          </div>
+
+          <div>
+            <AuthInput
+              type="password"
+              value={pwd}
+              onChange={(e) => setPwd(e.target.value)}
+              placeholder="Create a Password"
+              required
+            />
+            {passwordError && (
+              <p className="mt-1 text-xs text-red-400">⚠️ {passwordError}</p>
+            )}
+            {pwd && !passwordError && (
+              <p className="mt-1 text-xs text-green-400">✅ Password looks good!</p>
+            )}
+          </div>
 
           <div>
             <div className="relative">
@@ -230,6 +275,9 @@ export default function Register() {
                   );
                 })}
               </div>
+              {interestsError && (
+                <p className="mt-2 text-xs text-red-400 text-center">⚠️ {interestsError}</p>
+              )}
             </div>
           </div>
 

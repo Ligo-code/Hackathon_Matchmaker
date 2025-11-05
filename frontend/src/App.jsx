@@ -4,6 +4,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 
+// Pages
 import Dashboard from "./pages/Dashboard";
 import Requests from "./pages/Requests";
 import Profile from "./pages/Profile";
@@ -13,36 +14,37 @@ import Chats from "./pages/Chats";
 
 export default function App() {
   const location = useLocation();
-  const fetchMe = useAuthStore((s) => s.fetchMe);
+  const initAuth = useAuthStore((s) => s.initAuth);
 
-  // Check user session on app load
+  // === On app load: verify session from cookie (Safari fix) ===
   useEffect(() => {
-    fetchMe();
-  }, [fetchMe]);
+    initAuth();
+  }, [initAuth]);
 
+  // Hide navbar on login/register pages
   const hideNavbar =
     location.pathname === "/login" || location.pathname === "/register";
 
   return (
     <div className="relative min-h-screen bg-[#0a0a0a] text-text overflow-hidden">
-      {/* === Background glow circles (from AuthLayout) === */}
+      {/* === Background decorative glow circles === */}
       <div className="pointer-events-none absolute -top-16 -left-20 h-72 w-72 rounded-full bg-lime-400/20 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 -right-20 h-80 w-80 rounded-full bg-fuchsia-500/15 blur-3xl" />
 
-      {/* Navbar */}
+      {/* === Navbar === */}
       {!hideNavbar && <Navbar />}
 
-      {/* Routes */}
+      {/* === App Routes === */}
       <Routes>
-        {/* Redirect root */}
+        {/* Default redirect */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected routes */}
+        {/* Protected routes (require authentication) */}
         <Route
           path="/dashboard"
           element={

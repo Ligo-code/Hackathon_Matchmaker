@@ -12,13 +12,17 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "https://hackathon-matchmaker-app.onrender.com", 
+      "http://localhost:5173" 
+    ],
     methods: ["GET", "POST"],
-    credentials: true, // allow cookies over socket transport
+    credentials: true, 
     allowedHeaders: ["Content-Type", "Authorization"],
   },
   transports: ["websocket", "polling"],
 });
+
 
 chatSocket(io);
 

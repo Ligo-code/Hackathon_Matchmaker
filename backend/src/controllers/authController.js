@@ -9,11 +9,15 @@ function sign(uid) {
 }
 
 function setAuthCookie(res, token) {
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: NODE_ENV === "production" ? "None" : "Lax",
-    secure: NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    secure: isProduction,                     
+    sameSite: isProduction ? "None" : "Lax",  
+    domain: isProduction ? ".onrender.com" : undefined, 
+    path: "/",                                
+    maxAge: 7 * 24 * 60 * 60 * 1000,          
   });
 }
 

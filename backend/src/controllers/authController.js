@@ -4,23 +4,25 @@ import User from "../models/User.js";
 const { JWT_SECRET = "dev_secret_change_me", NODE_ENV = "development" } =
   process.env;
 
+// --- Helper to sign JWT ---
 function sign(uid) {
   return jwt.sign({ uid }, JWT_SECRET, { expiresIn: "7d" });
 }
 
+// --- Helper to set cookie (Safari-safe) ---
 function setAuthCookie(res, token) {
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = NODE_ENV === "production";
 
   res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProduction,                     
-    sameSite: isProduction ? "None" : "Lax",  
-    domain: isProduction ? ".onrender.com" : undefined, 
-    path: "/",                                
-    maxAge: 7 * 24 * 60 * 60 * 1000,          
+    httpOnly: true,                    // keep it secure from JS
+    secure: isProduction,              // required for SameSite=None
+    sameSite: isProduction ? "None" : "Lax",
+    path: "/",                         // no domain! Safari blocks it on Render
+    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
   });
 }
 
+// --- Register ---
 export async function register(req, res) {
   try {
     const { name, email, password, role, experience, interests } = req.body;
@@ -60,6 +62,7 @@ export async function register(req, res) {
   }
 }
 
+// --- Login ---
 export async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -81,6 +84,7 @@ export async function login(req, res) {
   }
 }
 
+// --- Me (check session) ---
 export async function me(req, res) {
   try {
     const token = req.cookies?.token;
@@ -94,11 +98,13 @@ export async function me(req, res) {
   }
 }
 
+// --- Logout ---
 export async function logout(req, res) {
   res.clearCookie("token", {
     httpOnly: true,
     sameSite: NODE_ENV === "production" ? "None" : "Lax",
     secure: NODE_ENV === "production",
+    path: "/", // added for full cleanup
   });
   res.json({ ok: true });
 }

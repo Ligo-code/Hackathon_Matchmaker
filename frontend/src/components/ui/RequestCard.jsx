@@ -18,35 +18,37 @@ export default function RequestCard({
   return (
     <div
       className="
-        relative mx-auto mt-10
-        w-[27rem] h-[36rem]
+        relative mx-auto mt-8
+        w-[340px] sm:w-[360px] md:w-[27rem]
+        min-h-[30rem] sm:min-h-[32rem] md:h-[36rem]
         flex flex-col items-center justify-start
         rounded-[var(--radius-xl)]
         bg-[var(--color-surface)]
         border-2 border-[var(--color-primary)]
         shadow-[var(--shadow-card)]
-        px-10 py-10 text-center
+        px-4 sm:px-6 py-6 text-center
+        md:px-10 md:py-10
       "
     >
       {/* avatar */}
       <img
         src="/images/ghost.png"
         alt="avatar"
-        className="w-[150px] h-[150px] object-contain mb-8"
+        className="w-[120px] h-[120px] object-contain mb-6 md:w-[150px] md:h-[150px] md:mb-8"
       />
 
       {/* name */}
-      <h3 className="text-[32px] font-bold text-[var(--color-text)] mb-[4px]">
+      <h3 className="text-[26px] md:text-[32px] font-bold text-[var(--color-text)] mb-[4px]">
         {name}
       </h3>
 
       {/* role + experience */}
-      <p className="text-[24px] text-[var(--color-text)] font-medium mb-[4px] capitalize">
+      <p className="text-[20px] md:text-[24px] text-[var(--color-text)] font-medium mb-[4px] capitalize">
         {role} · {experience}
       </p>
 
       {/* score */}
-      <p className="text-[24px] text-[var(--color-text)] mb-[10px]">
+      <p className="text-[20px] md:text-[24px] text-[var(--color-text)] mb-[10px]">
         Match Score:{" "}
         <span className="text-[var(--color-primary)] font-semibold">
           {matchScore}%
@@ -54,14 +56,14 @@ export default function RequestCard({
       </p>
 
       {/* interests */}
-      <div className="text-[18px] text-[var(--color-muted)] leading-tight mb-[24px]">
+      <div className="text-[16px] md:text-[18px] text-[var(--color-muted)] leading-tight mb-[20px] md:mb-[24px] px-2 md:px-0 break-words">
         <p>Interests: {interests?.join(", ")}</p>
       </div>
 
       <div className="flex-1"></div>
 
       {/* buttons */}
-      <div className="flex justify-center gap-6 mb-4">
+      <div className="flex justify-center gap-4 md:gap-6 mb-4">
         <Button variant="primary" onClick={onAccept}>
           ✅ Accept
         </Button>
@@ -73,12 +75,12 @@ export default function RequestCard({
 
       {/* arrows */}
       {showPrev && (
-        <div className="absolute -left-24 top-1/2 -translate-y-1/2">
+        <div className="hidden md:block absolute -left-24 top-1/2 -translate-y-1/2">
           <CircleButton direction="left" onClick={onPrev} />
         </div>
       )}
       {showNext && (
-        <div className="absolute -right-24 top-1/2 -translate-y-1/2">
+        <div className="hidden md:block absolute -right-24 top-1/2 -translate-y-1/2">
           <CircleButton direction="right" onClick={onNext} />
         </div>
       )}

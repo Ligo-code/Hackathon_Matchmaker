@@ -21,12 +21,10 @@ export default function Profile() {
     roles: [],
   });
 
-  // загрузка профиля
   useEffect(() => {
     if (!user) fetchMe();
   }, [user, fetchMe]);
 
-  // загрузка опций
   useEffect(() => {
     async function fetchOptions() {
       try {
@@ -82,44 +80,45 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <main className="flex flex-col items-center pt-20 text-center">
+      <main className="flex flex-col items-center pt-10 md:pt-20 text-center">
         <p className="text-[var(--color-muted)]">Loading profile...</p>
       </main>
     );
   }
 
   return (
-    <main className="flex flex-col items-center pt-14 text-center">
-      <h2 className="text-[26px] font-bold text-primary mb-2">
+    <main className="flex flex-col items-center pt-10 md:pt-20 px-4 text-center">
+      <h2 className="text-[26px] font-bold text-primary mb-2 text-center max-w-[22rem] sm:max-w-none">
         Your Ghostly ID
       </h2>
-      <p className="text-[16px] text-[var(--color-muted)] mb-10">
-        This is your haunted hacker profile - edit it if you dare.🕸️
+      <p className="text-[16px] text-[var(--color-muted)] mb-6 md:mb-10 text-center max-w-[22rem] sm:max-w-none">
+        This is your haunted hacker profile — edit it if you dare. 🕸️
       </p>
 
       <div
         className="
           relative mx-auto mt-8
-          w-[27rem] min-h-[30rem]
+          w-[340px] sm:w-[360px] md:w-[27rem]
+          min-h-[30rem] sm:min-h-[32rem] md:min-h-[36rem]
           flex flex-col items-center
           rounded-[var(--radius-xl)]
           bg-[var(--color-surface)]
           border-2 border-[var(--color-primary)]
           shadow-[var(--shadow-card)]
-          px-10 py-10 text-left
+          px-4 sm:px-6 py-6 md:px-10 md:py-10 text-left
         "
       >
         {!editMode && (
           <img
             src="/images/ghost.png"
             alt="avatar"
-            className="w-[150px] h-[150px] object-contain mb-8 self-center"
+            className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] object-contain mb-6 md:mb-8 self-center"
           />
         )}
 
         {!editMode ? (
           <>
-            <div className="space-y-4 text-[18px] text-[var(--color-text)] w-full">
+            <div className="space-y-4 text-[16px] md:text-[18px] text-[var(--color-text)] w-full">
               <div className="flex items-center gap-3">
                 <User className="text-[var(--color-primary)] w-5 h-5" />
                 <span className="font-medium">{user.name}</span>
@@ -223,7 +222,7 @@ export default function Profile() {
         )}
       </div>
 
-      <p className="mt-10 text-sm text-[var(--color-muted)]">
+      <p className="mt-6 text-sm text-[var(--color-muted)]">
         Want to vanish from haunted network?{" "}
         <button
           onClick={logout}

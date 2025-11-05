@@ -9,15 +9,13 @@ function sign(uid) {
   return jwt.sign({ uid }, JWT_SECRET, { expiresIn: "7d" });
 }
 
-// --- Helper to set cookie (Safari-safe) ---
 function setAuthCookie(res, token) {
   const isProduction = NODE_ENV === "production";
 
   res.cookie("token", token, {
     httpOnly: true,              // prevent JS access
     secure: isProduction,        // required for SameSite=None
-    sameSite: "None",            // allow cross-domain cookie
-    domain: ".onrender.com",     // allow both app. and api. subdomains
+    sameSite: isProduction ? "None" : "Lax",  
     path: "/",                   // available to all routes
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });

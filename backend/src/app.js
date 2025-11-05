@@ -25,9 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.get("/", (req, res) => {
-  res.json({ message: "Hackathon Matchmaker Backend API" });
-});
+
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });

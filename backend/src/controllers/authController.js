@@ -14,11 +14,12 @@ function setAuthCookie(res, token) {
   const isProduction = NODE_ENV === "production";
 
   res.cookie("token", token, {
-    httpOnly: true,                    // keep it secure from JS
-    secure: isProduction,              // required for SameSite=None
-    sameSite: isProduction ? "None" : "Lax",
-    path: "/",                         // no domain! Safari blocks it on Render
-    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
+    httpOnly: true,              // prevent JS access
+    secure: isProduction,        // required for SameSite=None
+    sameSite: "None",            // allow cross-domain cookie
+    domain: ".onrender.com",     // allow both app. and api. subdomains
+    path: "/",                   // available to all routes
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 }
 

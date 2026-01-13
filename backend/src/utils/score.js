@@ -15,3 +15,11 @@ export const weightedScore01 = (me, cand) => {
   // 70% role compatibility + 30% shared interests
   return +(0.7 * roleScore + 0.3 * interestScore).toFixed(3); // [0..1]
 };
+
+// NEW: hybrid score = baseline + semantic (ML)
+export const hybridScore01 = (baseline01, semantic01) => {
+  // Keep baseline as anchor for interpretability & cold start robustness
+  // Example weights: 0.65 baseline + 0.35 semantic
+  const score = 0.65 * baseline01 + 0.35 * semantic01;
+  return +score.toFixed(3);
+};

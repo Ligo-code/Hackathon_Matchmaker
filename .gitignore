@@ -13,3 +13,10 @@ Thumbs.db
 # Logs
 *.log
 backend/cookies*.txt
+
+# ML service (Python)
+ml-service/.venv/
+ml-service/__pycache__/
+ml-service/*.env
+ml-service/.env
+ml-service/.env.*

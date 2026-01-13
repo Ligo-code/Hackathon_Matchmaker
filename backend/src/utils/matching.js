@@ -1,13 +1,17 @@
 import { weightedScore01 } from './score.js';
+import { getSemanticSimilarity01 } from "../services/mlClient.js";
 
 /**
  * Calculate match score between two users (0-100)
  */
-export const calculateMatchScore = (user1, user2) => {
+export const calculateMatchScore = async (user1, user2) => {
   if (!user1 || !user2) return 0;
-  
-  const score01 = weightedScore01(user1, user2);
-  return Math.round(score01 * 100); // Convert to 0-100 range
+
+  const baseline01 = weightedScore01(user1, user2); // the original logic
+  const semantic01 = await getSemanticSimilarity01(user1, user2); // ML signal (0..1)
+
+  const final01 = hybridScore01(baseline01, semantic01);
+  return Math.round(final01 * 100);
 };
 
 /**
@@ -35,17 +39,19 @@ export const getCandidates = async (currentUser, userModel, inviteModel) => {
  */
 export const getNextCandidate = async (currentUser, userModel, inviteModel) => {
   const candidates = await getCandidates(currentUser, userModel, inviteModel);
-  
+
   if (candidates.length === 0) {
     return null; // No more candidates
   }
-  
-  // Calculate match scores for all candidates
-  const candidatesWithScores = candidates.map(candidate => ({
-    ...candidate.toObject(),
-    matchScore: calculateMatchScore(currentUser, candidate)
-  }));
-  
+
+  // Calculate scores concurrently
+  const candidatesWithScores = await Promise.all(
+    candidates.map(async (candidate) => ({
+      ...candidate.toObject(),
+      matchScore: await calculateMatchScore(currentUser, candidate),
+    }))
+  );
+
   // Sort by match score and add some randomness
   candidatesWithScores.sort((a, b) => {
     const scoreDiff = b.matchScore - a.matchScore;
@@ -55,7 +61,7 @@ export const getNextCandidate = async (currentUser, userModel, inviteModel) => {
     }
     return scoreDiff;
   });
-  
+
   return candidatesWithScores[0];
 };
 

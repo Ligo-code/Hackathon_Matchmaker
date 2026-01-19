@@ -20,3 +20,4 @@ ml-service/__pycache__/
 ml-service/*.env
 ml-service/.env
 ml-service/.env.*
+*.pyc

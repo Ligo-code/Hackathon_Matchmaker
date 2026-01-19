@@ -76,3 +76,48 @@ npm run dev:backend
 npm install
 ```
 
+## 🔍 Semantic Matching (ML Microservice)
+
+In addition to the rule-based matching logic, the project includes an **optional ML-powered semantic similarity microservice** that improves match quality when user interests are expressed using different but related terms.
+
+### How it works
+
+- A **Python FastAPI microservice** computes semantic similarity between user profiles using **sentence-transformers (all-MiniLM-L6-v2)**.
+- The backend sends two user profiles as text to the ML service:
+  - **Interests** (selected during registration)
+  - **Free-text bio** (if provided)
+- The service returns a normalized cosine similarity score (`0.0 – 1.0`) based on sentence embeddings.
+
+Example:
+- `"react developer frontend"` ↔ `"vue developer frontend"` → high similarity  
+- `"react developer frontend"` ↔ `"banana developer frontend"` → low similarity  
+
+### Integration Design
+
+- The Node.js backend calls the ML service via HTTP:
+  - `POST /similarity`
+- Profile text is built deterministically from user data:
+  - `interests + bio`
+- The integration is **fault-tolerant**:
+  - If the ML service is unavailable or not configured, the system **automatically falls back** to baseline rule-based matching.
+  - No user-facing errors or blocked requests.
+
+### Relevant Files
+
+- ML client (Node.js):  
+  `backend/src/services/mlClient.js`
+- ML microservice (Python):  
+  `ml-service/app.py`
+
+### Set backend environment variable:
+ML_SERVICE_URL=http://localhost:8000
+
+### Run ML Service Locally
+
+```bash
+cd ml-service
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app:app --reload --port 8000
+

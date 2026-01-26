@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -21,6 +24,8 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.6",
+    "jest": "^30.2.0",
     "nodemon": "^3.0.1"
   }
 }

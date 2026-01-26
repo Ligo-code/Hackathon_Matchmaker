@@ -156,7 +156,7 @@ const fillTemplate = (template, user, formattedInterests) => {
 export const generateBioFromTemplate = (user) => {
   const { role, interests, experience } = user;
 
-  if (!role || !interests || !experience) {
+  if (!role || !interests || interests.length === 0 || !experience) {
     throw new Error("Missing required user data for bio generation");
   }
 

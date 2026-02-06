@@ -12,7 +12,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { requestLogger, corsConfig } from "./middleware/logger.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
-
+import bioRoutes from "./routes/bio.js";
 dotenv.config();
 
 const app = express();
@@ -38,6 +38,7 @@ app.use("/api/auth", authRouter);
 app.use("/api", optionsRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/profile", profileRouter);
+app.use("/api/profile/bio", bioRoutes);
 app.use("/api/requests", requestsRouter);
 app.use("/api/chats", chatRoutes);
 app.use("/api/messages", messageRoutes);

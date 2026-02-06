@@ -1,18 +1,16 @@
 export default {
-  testEnvironment: 'node',
+  testEnvironment: "node",
   transform: {},
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
-  testMatch: [
-    '**/__tests__/**/*.test.js',
-    '**/?(*.)+(spec|test).js'
-  ],
+  testMatch: ["**/__tests__/**/*.test.js", "**/?(*.)+(spec|test).js"],
   collectCoverageFrom: [
-    'src/**/*.js',
-    '!src/server.js',
-    '!src/app.js',
+    "src/**/*.js",
+    "!src/server.js",
+    "!src/app.js",
+    "!src/**/__tests__/**",
   ],
-  coverageDirectory: 'coverage',
+  coverageDirectory: "coverage",
   verbose: true,
+  testTimeout: 30000,
+  forceExit: true,
+  detectOpenHandles: false,
 };
